@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="stockLecture">
+	<typeAlias alias="stockLectureVO" type="kr.or.redant.vo.StockLectureVO"/>
+   
+	<resultMap id="stockLectureResultMap" class="stockLectureVO">
+		<result property="sl_no" column="sl_no"/>
+      	<result property="sl_title" column="sl_title"/>
+      	<result property="sl_content" column="sl_content"/>
+      	<result property="sl_hit" column="sl_hit"/>
+      	<result property="sl_reg_date" column="sl_reg_date"/>
+      	<result property="sl_status" column="sl_status"/>
+      	<result property="lecture_url" column="lecture_url"/>
+      	<result property="admin_id" column="admin_id"/>
+      	<result property="sl_writer" column="sl_writer"/>
+      	<result property="sl_items" column="sl_no" select="slImageFile.fileitemList"/>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT * 
+        FROM   STOCKLECTURE
+		WHERE  SL_STATUS = 'Y'
+	</sql>
+	
+	<sql id="searchCondition">
+		<dynamic prepend="AND">
+        	<isNotEmpty property="search_keyword">
+        		<isEqual property="search_keycode" compareValue="TOTAL" open="(" close=")">
+        			   TH_BO_TITLE LIKE '%'||#search_keyword#||'%' 
+        			OR TH_BO_ADMINWRITER LIKE '%'||#search_keyword#||'%'
+        		</isEqual>
+        		<isEqual property="search_keycode" compareValue="TITLE" >
+        			TH_BO_TITLE LIKE '%'||#search_keyword#||'%' 
+        		</isEqual>
+        		<isEqual property="search_keycode" compareValue="WRITER" >
+        			TH_BO_ADMINWRITER LIKE '%'||#search_keyword#||'%'
+        		</isEqual>
+        	</isNotEmpty>
+        </dynamic>
+	</sql>
+	
+	<insert id="insertStockLecture" parameterClass="stockLectureVO">
+		<selectKey keyProperty="sl_no" resultClass="String">
+			SELECT STOCKLECTURE_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO STOCKLECTURE(SL_NO
+							      ,SL_TITLE
+							      ,SL_CONTENT
+							      ,LECTURE_URL
+							      ,ADMIN_ID
+							      ,SL_WRITER) 
+		VALUES(#sl_no#
+		      ,#sl_title#
+		      ,#sl_content#
+		      ,#lecture_url#
+		      ,#admin_id#
+		      ,#sl_writer#)
+	</insert>
+	
+	<select id="totalCount" parameterClass="map" resultClass="String">
+		SELECT COUNT(SL_NO) 
+		FROM   STOCKLECTURE 
+		WHERE  SL_STATUS = 'Y' 
+		<include refid="searchCondition"/>
+	</select>
+	
+	<select id="getStockLectureList" parameterClass="map" resultMap="stockLectureResultMap">
+		SELECT B.*
+		FROM   (SELECT ROWNUM SL_RNUM, A.*
+				FROM   (<include refid="selectAll"/>
+				        <include refid="searchCondition"/>) A ) B
+		<![CDATA[
+		WHERE  B.SL_RNUM <= #startCount# 
+		AND    B.SL_RNUM >= #endCount#		
+		]]>
+		ORDER BY SL_NO DESC
+	</select>
+	
+	<select id="getStockLectureInfo" parameterClass="map" resultMap="stockLectureResultMap">
+		SELECT * 
+        FROM   STOCKLECTURE 
+        WHERE  SL_NO = #sl_no# 
+	</select>
+	
+	<update id="deleteStockLecture" parameterClass="map">
+		UPDATE STOCKLECTURE 
+		SET    SL_STATUS = 'N' 
+		WHERE  SL_NO = #sl_no#
+	</update>
+	
+	<update id="updateStockLecture" parameterClass="stockLectureVO">
+		UPDATE STOCKLECTURE
+		SET    SL_TITLE = #sl_title#
+			  ,SL_CONTENT = #sl_content#
+			  ,LECTURE_URL = #lecture_url#
+		WHERE  SL_NO = #sl_no# 
+	</update>
+	
+	<update id="plusHits" parameterClass="map">
+		UPDATE STOCKLECTURE 
+		SET	   SL_HIT = SL_HIT+1
+		WHERE  SL_NO = #sl_no#		
+	</update>
+   
+ </sqlMap>

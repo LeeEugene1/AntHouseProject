@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+	<!-- main 화면 -->
+	<definition name="mainTemplate" template="/WEB-INF/views/mainTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare">
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/home.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"></put-attribute>
+	</definition>
+		
+	<!-- 로그인 화면 띄우는 용도 -->
+	<definition name="login/login" template="/WEB-INF/views/join/loginTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare" >
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/join/login.jsp"></put-attribute>
+	</definition>
+	
+	<!-- 회원가입 화면 띄우는 용도 -->
+	<definition name="join/*" template="/WEB-INF/views/join/loginTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare" >
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/join/{1}.jsp"></put-attribute>
+	</definition>
+	<definition name="join/joinForm" template="/WEB-INF/views/join/loginTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare" >
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/join/joinForm.jsp"></put-attribute>
+	</definition>
+	
+<!-- 	side 메뉴 있는 commonTemplate -->
+	<definition name="commonTemplate" template="/WEB-INF/views/commonTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare">
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"></put-attribute>
+		<put-attribute name="left" value="/WEB-INF/views/layout/left.jsp"></put-attribute>
+		<put-attribute name="right" value="/WEB-INF/views/layout/right.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"></put-attribute>
+	</definition>
+	
+	<!-- 국내증시 전용 -->
+	<definition name="stockInfo/stockMain" template="/WEB-INF/views/stockInfo/stockTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare">
+		<put-attribute name="title" value="개미의 집"></put-attribute>
+		<put-attribute name="header" value="/WEB-INF/views/layout/header.jsp"></put-attribute>
+		<put-attribute name="left" value="/WEB-INF/views/layout/left.jsp"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/stockInfo/stockMain.jsp"></put-attribute>
+		<put-attribute name="footer" value="/WEB-INF/views/layout/footer.jsp"></put-attribute>
+	</definition>
+	
+	<!-- 공통화면(메인,로그인,회원가입 제외)  -->
+	<definition name="*/*" extends="commonTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"></put-attribute>
+	</definition>
+	
+	<!-- 로그인 화면 띄우는 용도 -->
+	<definition name="member/radioPopup" template="/WEB-INF/views/member/popupTemplate.jsp" preparer="kr.or.ddit.utiles.TilesCustomViewPrepare" >
+		<put-attribute name="title" value="실시간 주식 라디오"></put-attribute>
+		<put-attribute name="content" value="/WEB-INF/views/member/radioPopup.jsp"></put-attribute>
+	</definition>
+
+</tiles-definitions>

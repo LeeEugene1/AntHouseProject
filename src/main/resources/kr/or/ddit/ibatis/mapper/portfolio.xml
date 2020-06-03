@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="portfolio">
+   <typeAlias alias="portfolioVO" type="kr.or.redant.vo.PortfolioVO"/>
+   
+   <resultMap id="portfolioResultMap" class="portfolioVO">
+		<result property="portfolio_code" column="portfolio_code"/>
+		<result property="portfolio_name" column="portfolio_name"/>
+		<result property="portfolio_title" column="portfolio_title"/>
+		<result property="portfolio_content" column="portfolio_content"/>
+		<result property="portfolio_status" column="portfolio_status"/>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT *
+			FROM PORTFOLIO
+			WHERE PORTFOLIO_STATUS = 'Y'
+	</sql>
+		
+	
+	<select id="portfolioInfo" parameterClass="map" resultMap="portfolioResultMap">
+		<include refid="selectAll"/>
+		AND PORTFOLIO_CODE = #portfolio_code#
+		
+	</select>
+	
+	<select id="portfolioList" resultClass="portfolioVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM PORTFOLIO_RNUM, A.*
+					FROM (<include refid="selectAll"/>) A) B
+		ORDER BY B.PORTFOLIO_CODE ASC				  
+	</select>
+	
+	
+	<insert id="insertPortfolio" parameterClass="portfolioVO">
+      <selectKey keyProperty="portfolio_code" resultClass="String">
+         SELECT PORTFOLIO_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO PORTFOLIO(PORTFOLIO_CODE
+                     ,PORTFOLIO_NAME
+                     ,PORTFOLIO_TITLE
+                     ,PORTFOLIO_CONTENT)
+               VALUES(#portfolio_code#
+                  ,#portfolio_name#
+                  ,#portfolio_title#
+                  ,#portfolio_content#)
+   </insert>
+   
+   <update id="updatePortfolio" parameterClass="portfolioVO">
+      UPDATE PORTFOLIO
+         SET PORTFOLIO_NAME   	=  #portfolio_name#
+         	,PORTFOLIO_TITLE    =  #portfolio_title# 
+         	,PORTFOLIO_CONTENT  =  #portfolio_content#
+       WHERE PORTFOLIO_CODE = #portfolio_code#
+   </update>
+   
+   	<delete id="deletePortfolio" parameterClass="map">
+		update PORTFOLIO
+	   		set PORTFOLIO_STATUS = 'N'
+	 	where PORTFOLIO_CODE = #portfolio_code#
+	</delete>
+   	
+
+   
+ </sqlMap>

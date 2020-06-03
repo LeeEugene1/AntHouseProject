@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="stockItem">
+   <typeAlias alias="stockItemVO" type="kr.or.redant.vo.StockItemVO"/>
+    
+    <resultMap id="stockItemResultMap" class="stockItemVO">
+		<result property="stock_item_code" column="stock_item_code"/>
+		<result property="stock_item_name" column="stock_item_name"/>
+	</resultMap>
+	
+	<sql id="selectAll"> SELECT * FROM STOCKITEM</sql>
+	
+	<sql id="searchCondition">
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="search_keyword">
+                     STOCK_ITEM_NAME LIKE '%'||#search_keyword#||'%'
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="stockItemList" resultClass="stockItemVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM STOCK_ITEM_RNUM, A.*
+					FROM (<include refid="selectAll"/>
+						  <include refid="searchCondition"/>
+						  ) A) B
+		<![CDATA[
+		WHERE B.STOCK_ITEM_RNUM <= #startCount#   
+   		  AND B.STOCK_ITEM_RNUM >= #endCount#   
+  		]]>   
+		ORDER BY B.STOCK_ITEM_RNUM DESC				  
+	</select>
+	
+	<select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(STOCK_ITEM_NAME)
+   		  FROM STOCKITEM
+   		 <include refid="searchCondition"/>  
+   </select>
+   
+ </sqlMap>

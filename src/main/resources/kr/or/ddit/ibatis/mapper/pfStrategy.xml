@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="pfstrategy">
+   <typeAlias alias="pfstrategyVO" type="kr.or.redant.vo.PortfolioResultVO"/>
+     <resultMap id="pfstrategyResultMap" class="pfstrategyVO">
+		<result property="pfs_code" column="pfs_code"/>
+		<result property="pfs_name" column="pfs_name"/>
+		<result property="pfs_start_date" column="pfs_start_date"/>
+		<result property="pfs_end_date" column="pfs_end_date"/>
+		<result property="pfs_rr" column="pfs_rr"/>
+		<result property="pfs_9month_rr" column="pfs_9month_rr"/>
+		<result property="pfs_2year_rr" column="pfs_2year_rr"/>
+		<result property="pfs_1month_rr" column="pfs_1month_rr"/>
+		<result property="pfs_3month_rr" column="pfs_3month_rr"/>
+		<result property="pfs_6month_rr" column="pfs_6month_rr"/>
+		<result property="pfs_1year_rr" column="pfs_1year_rr"/>
+		<result property="pfs_3year_rr" column="pfs_3year_rr"/>
+		<result property="stock_item_code" column="stock_item_code"/>
+		<result property="portfolio_code" column="portfolio_code"/>
+		<result property="stock_item_name" column="stock_item_name" />
+	</resultMap>
+
+	<select id="momList" resultClass="pfstrategyVO" >
+		SELECT PFS_CODE,
+                 PFS_NAME,
+                 PFS_START_DATE,
+                 PFS_END_DATE, 
+                 PORTFOLIO_CODE,
+                ROUND(AVG(PFS_1MONTH_RR),2) AS pfs_1month_rr,
+                ROUND(AVG(PFS_3MONTH_RR),2) AS pfs_3month_rr,
+                ROUND(AVG(PFS_6MONTH_RR),2) AS pfs_6month_rr,
+                ROUND(AVG(PFS_9MONTH_RR),2) AS pfs_9month_rr,
+                ROUND(AVG(PFS_1YEAR_RR),2) AS pfs_1year_rr,
+                ROUND(AVG(PFS_2YEAR_RR),2) AS pfs_2year_rr,
+                ROUND(AVG(PFS_3YEAR_RR),2) AS pfs_3year_rr,
+                ROUND(AVG(PFS_RR),2) AS pfs_rr
+  		FROM  PORTFOLIORESULT
+  		GROUP BY PFS_CODE, PFS_NAME, PFS_START_DATE, PFS_END_DATE, PORTFOLIO_CODE
+  		ORDER BY PFS_CODE DESC
+	</select>
+	
+	
+	<select id="strategyList" resultClass="pfstrategyVO" parameterClass="map">
+		SELECT * FROM (
+			SELECT DISTINCT A.STOCK_ITEM_CODE,
+			                C.STOCK_ITEM_NAME,
+			                ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_start_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) AS pfs_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_1month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_3month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_6month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_6month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_6month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_9month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_9month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_9month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_1year_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_2year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_2year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_2year_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_3year_rr
+		      FROM DAILYPRICE A, STOCKITEM C
+		     WHERE A.STOCK_ITEM_CODE = C.STOCK_ITEM_CODE
+		       AND NOT ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_start_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) IS NULL
+		     ORDER BY pfs_rr DESC)
+		 <![CDATA[    
+		 WHERE ROWNUM <= #pfs_count#
+		 ]]>
+	</select>
+	
+	<select id="strategyLowList" resultClass="pfstrategyVO" parameterClass="map">
+		SELECT * FROM (
+			SELECT DISTINCT A.STOCK_ITEM_CODE,
+			                C.STOCK_ITEM_NAME,
+			                ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_start_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) AS pfs_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_1month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_3month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_6month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_6month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_6month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_9month# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_9month_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_9month_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_1year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_1year_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_2year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_2year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_2year_rr,
+		                    ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/NVL((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3year# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE),(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_3year_null# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)))-1)*100,2) AS pfs_3year_rr
+		      FROM DAILYPRICE A, STOCKITEM C
+		     WHERE A.STOCK_ITEM_CODE = C.STOCK_ITEM_CODE
+		       AND NOT ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_end_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')=#pfs_start_date# AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) IS NULL
+		     ORDER BY pfs_rr ASC)
+		 <![CDATA[    
+		 WHERE ROWNUM <= #pfs_count#
+		 ]]>
+	</select>  
+	
+	<select id="listView" resultClass="pfstrategyVO" parameterClass="map">
+		SELECT 	A.PORTFOLIO_CODE,
+				A.PFS_CODE,
+				A.PFS_NAME,
+				A.PFS_START_DATE,
+				A.PFS_END_DATE,
+				A.PFS_9MONTH_RR,
+				A.PFS_2YEAR_RR,
+				A.PFS_1MONTH_RR,
+				A.PFS_3MONTH_RR,
+				A.PFS_6MONTH_RR,
+				A.PFS_1YEAR_RR, 
+				A.PFS_3YEAR_RR,
+				A.STOCK_ITEM_CODE,
+				A.PFS_RR,
+				B.STOCK_ITEM_NAME
+		FROM PORTFOLIORESULT A, STOCKITEM B
+		WHERE A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE
+		AND A.PFS_CODE = #pfs_code# 
+		ORDER BY A.PFS_RR DESC
+	</select>        
+	
+	<insert id="insertsteategy" parameterClass="pfstrategyVO">
+		INSERT INTO PORTFOLIORESULT(PORTFOLIO_CODE,
+									PFS_CODE,
+									PFS_NAME,
+									PFS_START_DATE,
+									PFS_END_DATE,
+									PFS_9MONTH_RR,
+									PFS_2YEAR_RR,
+									PFS_1MONTH_RR,
+									PFS_3MONTH_RR,
+									PFS_6MONTH_RR,
+									PFS_1YEAR_RR,
+									PFS_3YEAR_RR,
+									STOCK_ITEM_CODE,
+									PFS_RR)
+							VALUES( #portfolio_code#,
+									#pfs_code#,
+									#pfs_name#,
+									#pfs_start_date#,
+									#pfs_end_date#,
+									#pfs_9month_rr#,
+									#pfs_2year_rr#,
+									#pfs_1month_rr#,
+									#pfs_3month_rr#,
+									#pfs_6month_rr#,
+									#pfs_1year_rr#,
+									#pfs_3year_rr#,
+									#stock_item_code#,
+									#pfs_rr#)		
+	</insert>
+	
+	<delete id="deletePFS" parameterClass="map">
+		DELETE FROM PORTFOLIORESULT WHERE PFS_CODE = #pfs_code#
+	</delete>
+		
+	
+	
+ </sqlMap>

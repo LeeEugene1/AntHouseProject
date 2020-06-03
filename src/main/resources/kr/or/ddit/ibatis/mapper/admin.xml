@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="admin">
+	<typeAlias alias="adminVO" type="kr.or.redant.vo.AdminVO" />
+	
+	<resultMap class="adminVO" id="adminView">
+		<result property="admin_id" column="admin_id"></result>
+		<result property="admin_pass" column="admin_pass"></result>
+		<result property="admin_name" column="admin_name"></result>
+	</resultMap>
+
+	<sql id="selectAll">
+		SELECT *
+		  FROM ADMIN
+	</sql>
+	
+	<select id="adminInfo" parameterClass="map" resultMap="adminView">
+		<include refid="selectAll" />
+		<dynamic prepend="WHERE">
+			<isNotEmpty property="admin_id">
+				ADMIN_ID = #admin_id#
+			</isNotEmpty>
+			<isNotEmpty property="admin_pass" open="AND">
+				ADMIN_PASS = #admin_pass#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+	
+</sqlMap>

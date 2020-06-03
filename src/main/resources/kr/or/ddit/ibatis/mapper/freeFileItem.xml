@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap    
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="freeFileItem">
+	<typeAlias alias="freefileitemVO" type="kr.or.redant.vo.FreeFileItemVO"/>
+	
+	  <statement id="fileitemList" resultClass="freefileitemVO">
+   		SELECT *
+   			FROM FREEFILEITEM
+   			WHERE FR_BO_NO = #fr_bo_no#
+   	</statement>
+	
+	<insert id="insertFreeFileItem" parameterClass="freefileitemVO">
+		<selectKey keyProperty="fr_file_no">
+			SELECT FREE_FILE_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO FREEFILEITEM(FR_FILE_NO
+							,FR_BO_NO
+							,FR_FILE_NAME
+							,FR_FILE_SAVE_NAME
+							,FR_FILE_TYPE
+							,FR_FILE_SIZE)
+						VALUES(#fr_file_no#
+							,#fr_bo_no#
+							,#fr_file_name#
+							,#fr_file_save_name#
+							,#fr_file_type#
+							,#fr_file_size#)	
+	</insert>
+	
+	<select id="freeFileItemInfo" parameterClass="map" resultClass="freefileitemVO">
+		SELECT *
+			FROM FREEFILEITEM
+			WHERE FR_FILE_NO = #fr_file_no#
+	</select>
+</sqlMap>
+
+
+
+
+

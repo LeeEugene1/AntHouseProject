@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="interestItem">
+   <typeAlias alias="interestItemVO" type="kr.or.redant.vo.InterestItemVO"/>
+   
+   <sql id="selectAll"> SELECT * FROM INTERESTITEM</sql>
+   
+   <select id="interestItemList" resultClass="interestItemVO" parameterClass="map">
+		SELECT * FROM INTERESTITEM WHERE MEM_ID = #mem_id#  
+	</select>
+   
+   <delete id="deleteItem" parameterClass="map">
+		DELETE FROM INTERESTITEM WHERE MEM_ID=#mem_id# AND STOCK_ITEM_CODE = #stock_item_code#   		
+   </delete>
+   
+   <insert id="insertItem" parameterClass="interestItemVO">
+   		<selectKey keyProperty="isi_code" resultClass="String">
+			SELECT INTERESTITEM_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+  		INSERT INTO INTERESTITEM(ISI_CODE, STOCK_ITEM_CODE, MEM_ID, STOCK_ITEM_NAME) values(#isi_code#, #stock_item_code#, #mem_id#, #stock_item_name#)
+	</insert>
+	
+	<select id="getStockName" parameterClass="map" resultClass="String">
+		SELECT STOCK_ITEM_NAME FROM STOCKITEM WHERE STOCK_ITEM_CODE=#stock_item_code#
+	</select>
+	
+</sqlMap>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="daishin">
+	<typeAlias alias="dailyPriceVO" type="kr.or.redant.vo.DailyPriceVO" />
+	<typeAlias alias="stockItemVO" type="kr.or.redant.vo.StockItemVO" />
+	<typeAlias alias="businessDayVO" type="kr.or.redant.vo.BusinessDayVO" />
+	
+	<insert id="insertDaishinInfo" parameterClass="dailyPriceVO">
+		INSERT INTO DAILYPRICE
+					(STOCK_ITEM_CODE,
+					BS_DATE,
+					OPEN,
+					HIGH,
+					LOW,
+					CLOSE,
+					DIFF,
+					VOLUME,
+					MARCKET_CAP,
+					FLUCTUATION)
+		VALUES (#stock_item_code#,
+				#bs_date#,
+				#open#,
+				#high#,
+				#low#,
+				#close#,
+				#diff#,
+				#volume#,
+				#marcket_cap#,
+				#fluctuation#)
+	</insert>
+	
+	<insert id="insertDaishinCode" parameterClass="stockItemVO">
+		INSERT INTO STOCKITEM
+					(STOCK_ITEM_CODE,
+					STOCK_ITEM_NAME)
+		VALUES (#stock_item_code#,
+				#stock_item_name#)
+	</insert>
+	
+	<insert id="insertDaishinDay" parameterClass="businessDayVO">
+		INSERT INTO BUSINESSDAY
+					(BS_DATE)
+		VALUES (#bs_date#)
+	</insert>
+</sqlMap>

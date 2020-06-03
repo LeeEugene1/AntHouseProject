@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="stockStats">
+   <typeAlias alias="stockStatsVO" type="kr.or.redant.vo.StockStatsVO"/>
+    
+    <resultMap id="statsResultMap" class="stockStatsVO">
+		<result property="stock_item_code" column="stock_item_code"/>
+		<result property="marcket_cap" column="marcket_cap"/>
+		<result property="volume" column="volume"/>
+		<result property="rank" column="rank"/>
+	</resultMap>
+	
+	<select id="marcketStockStatsList" resultClass="stockStatsVO" parameterClass="map">
+		SELECT *
+		  FROM ( SELECT ROWNUM STATS_RNUM, STOCK_ITEM_CODE, MARCKET_CAP, RANK() OVER (ORDER BY MARCKET_CAP DESC) AS RANK
+		  		   FROM DAILYPRICE
+		  		  WHERE (BS_DATE = '19/05/20'))
+		 WHERE RANK BETWEEN #min_size# AND #max_size#
+	     ORDER BY RANK ASC
+	</select>
+	
+	<select id="volumeStockStatsList" resultClass="stockStatsVO" parameterClass="map">
+		SELECT *
+		  FROM ( SELECT ROWNUM STATS_RNUM, STOCK_ITEM_CODE, VOLUME, RANK() OVER (ORDER BY MARCKET_CAP DESC) AS RANK
+		  		   FROM DAILYPRICE
+		  		  WHERE (BS_DATE = '19/05/20'))
+		 WHERE RANK BETWEEN #min_vol# AND #max_vol#
+	     ORDER BY RANK ASC
+	</select>
+	
+	<select id="momStockStatsList" resultClass="stockStatsVO" parameterClass="map">
+		SELECT * FROM(  
+			SELECT ROWNUM rm, tmp.* FROM(
+				SELECT DISTINCT A.STOCK_ITEM_CODE,
+				                C.STOCK_ITEM_NAME,
+				                ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')='19/05/20' AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')='19/04/19' AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) AS MOM
+				  FROM DAILYPRICE A, STOCKITEM C
+				 WHERE A.STOCK_ITEM_CODE = C.STOCK_ITEM_CODE
+				   AND NOT ROUND((((SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')='19/05/20' AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE)/(SELECT B.CLOSE FROM DAILYPRICE B WHERE TO_DATE(BS_DATE,'YY/MM/DD')='19/04/19' AND A.STOCK_ITEM_CODE = B.STOCK_ITEM_CODE))-1)*100,2) IS NULL
+		     ORDER BY MOM DESC) tmp)
+	     WHERE rm BETWEEN #min_mom# AND #max_mom#
+	</select>
+   
+ </sqlMap>

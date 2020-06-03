@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="faqboard">
+   <typeAlias alias="faqboardVO" type="kr.or.redant.vo.FAQboardVO"/>
+   
+   <resultMap id="faqboardResultMap" class="faqboardVO">
+		<result property="faq_no" column="faq_no"/>
+		<result property="faq_title" column="faq_title"/>
+		<result property="faq_content" column="faq_content"/>
+		<result property="faq_hit" column="faq_hit"/>
+		<result property="faq_reg_date" column="faq_reg_date"/>
+		<result property="faq_status" column="faq_status"/>
+		<result property="admin_id" column="admin_id"/>
+		<result property="faq_writer" column="faq_writer"/>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT *
+			FROM FAQBOARD
+			WHERE FAQ_STATUS = 'Y'
+	</sql>
+		
+	
+	<select id="faqboardInfo" parameterClass="map" resultMap="faqboardResultMap">
+		<include refid="selectAll"/>
+		AND FAQ_NO = #faq_no#
+		
+	</select>
+	
+	<select id="faqboardList" resultClass="faqboardVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM FAQ_RNUM, A.*
+					FROM (<include refid="selectAll"/>) A) B
+						  
+		<![CDATA[
+ 		WHERE B.FAQ_RNUM <= #startCount#  
+  		  AND B.FAQ_RNUM >= #endCount#  
+ 		]]>  
+		ORDER BY B.FAQ_RNUM DESC				  
+	</select>
+	
+	<update id="updateHIT" parameterClass="map">
+      UPDATE FAQBOARD
+         SET FAQ_HIT = FAQ_HIT + 1
+       WHERE FAQ_NO = #faq_no#
+    </update>
+	
+	<insert id="insertFAQboard" parameterClass="faqboardVO">
+      <selectKey keyProperty="faq_no" resultClass="string">
+         SELECT FAQ_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO FAQBOARD(FAQ_NO
+                     ,FAQ_TITLE
+                     ,FAQ_WRITER
+                     ,FAQ_CONTENT
+                     ,ADMIN_ID)
+               VALUES(#faq_no#
+                  ,#faq_title#
+                  ,#faq_writer#
+                  ,#faq_content#
+                  ,#admin_id#)
+   </insert>
+   	
+   <update id="updateFAQboard" parameterClass="faqboardVO">
+      UPDATE FAQBOARD
+         SET FAQ_TITLE   =  #faq_title#
+         	,FAQ_CONTENT   =  #faq_content#
+       WHERE FAQ_NO = #faq_no#
+   </update>
+   	
+   	
+	<delete id="deleteFAQboard" parameterClass="map">
+		update FAQBOARD
+	   		set FAQ_STATUS = 'N'
+	 	where FAQ_NO = #faq_no#
+	</delete>
+   	
+	<select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(FAQ_NO)
+   		  FROM FAQBOARD
+   		 WHERE FAQ_STATUS = 'Y'
+   </select>
+   
+ </sqlMap>

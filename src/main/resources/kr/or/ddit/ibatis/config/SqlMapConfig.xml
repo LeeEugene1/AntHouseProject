@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+<sqlMapConfig>
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="32" maxSessions="10"
+		maxTransactions="5" useStatementNamespaces="true" />
+		
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/member.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/freeboard.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/stockForum.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/qnaboard.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/qnaFileItem.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/freeFileItem.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/sfFileItem.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/admin.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/faqboard.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/daishin.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/stockLecture.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/slImageFile.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/stockItem.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/interestItem.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/noticeboard.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/portfolio.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/businessday.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/pfStrategy.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/stockStats.xml"/>
+	<sqlMap resource="kr/or/ddit/ibatis/mapper/weka.xml"/>
+
+</sqlMapConfig>

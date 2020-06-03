@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="qnaboard">
+   <typeAlias alias="qnaboardVO" type="kr.or.redant.vo.QNAboardVO"/>
+   
+   <resultMap id="qnaboardResultMap" class="qnaboardVO">
+		<result property="qna_no" column="qna_no"/>
+		<result property="qna_title" column="qna_title"/>
+		<result property="qna_pass" column="qna_pass"/>
+		<result property="qna_content" column="qna_content"/>
+		<result property="qna_hit" column="qna_hit"/>
+		<result property="qna_reg_date" column="qna_reg_date"/>
+		<result property="qna_status" column="qna_status"/>
+		<result property="qna_group" column="qna_group"/>
+		<result property="qna_g_seq" column="qna_g_seq"/>
+		<result property="qna_depth" column="qna_depth"/>
+		<result property="mem_id" column="mem_id"/>
+		<result property="admin_id" column="admin_id"/>
+		<result property="qna_writer" column="qna_writer"/>
+		<result property="qna_items" column="qna_no" select="qnaFileItem.fileitemList"/>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT *
+			FROM QNABOARD
+			WHERE QNA_STATUS = 'Y'
+	</sql>
+		
+	<sql id="searchCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword">
+               <isEqual property="search_keycode" compareValue="search01" open="(" close=")">
+                     QNA_TITLE LIKE '%'||#search_keyword#||'%'
+                  OR QNA_WRITER LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+               <isEqual property="search_keycode" compareValue="search02">
+                     QNA_TITLE LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+               <isEqual property="search_keycode" compareValue="search03">
+                     QNA_WRITER LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="qnaboardInfo" parameterClass="map" resultMap="qnaboardResultMap">
+		<include refid="selectAll"/>
+		AND QNA_NO = #qna_no#
+		
+	</select>
+	
+	<select id="qnaboardList" resultClass="qnaboardVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM QNA_RNUM, A.*
+					FROM (<include refid="selectAll"/>
+						  <include refid="searchCondition"/>
+						  ORDER BY QNA_GROUP,QNA_G_SEQ DESC) A) B
+						  
+		<![CDATA[
+ 		WHERE B.QNA_RNUM <= #startCount#  
+  		  AND B.QNA_RNUM >= #endCount#  
+ 		]]>  
+		ORDER BY B.QNA_RNUM DESC				  
+	</select>
+	
+	<update id="updateHIT" parameterClass="map">
+      UPDATE QNABOARD
+         SET QNA_HIT = QNA_HIT + 1
+       WHERE QNA_NO = #qna_no#
+    </update>
+	
+	<insert id="insertQNAboard" parameterClass="qnaboardVO">
+      <selectKey keyProperty="qna_no" resultClass="string">
+         SELECT QNA_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO QNABOARD(QNA_NO
+                     ,QNA_TITLE
+                     ,QNA_WRITER
+                     ,QNA_PASS
+                     ,QNA_CONTENT
+                     ,QNA_GROUP
+                     ,MEM_ID)
+               VALUES(#qna_no#
+                  ,#qna_title#
+                  ,#qna_writer#
+                  ,#qna_pass#
+                  ,#qna_content#
+                  ,#qna_no#
+                  ,#mem_id#)
+   </insert>
+   	
+   <update id="updateQNAboard" parameterClass="qnaboardVO">
+      UPDATE QNABOARD
+         SET QNA_TITLE   =  #qna_title#
+         	,QNA_PASS       =  #qna_pass# 
+         	,QNA_CONTENT   =  #qna_content#
+       WHERE QNA_NO = #qna_no#
+   </update>
+   	
+   	   <!-- MAX(BO_SEQ) + 1인 값을 리턴해주세요! -->
+   <select id="incrementSEQ" parameterClass="qnaboardVO" resultClass="String">
+      SELECT MAX(QNA_G_SEQ) + 1
+        FROM QNABOARD
+       WHERE QNA_GROUP = #qna_group#
+   </select>
+   <!-- BO_SEQ : 자기자신 -->
+   <update id="updateSEQ" parameterClass="qnaboardVO">
+      UPDATE QNABOARD
+         SET QNA_G_SEQ = QNA_G_SEQ + 1
+       WHERE QNA_GROUP = #qna_group#
+         AND QNA_G_SEQ > #qna_g_seq#
+   </update>
+   	
+	<delete id="deleteQNAboard" parameterClass="map">
+		update QNABOARD
+	   		set QNA_STATUS = 'N'
+	 	where QNA_NO = #qna_no#
+	</delete>
+   	
+	<select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(QNA_NO)
+   		  FROM QNABOARD
+   		 WHERE QNA_STATUS = 'Y'
+   		 <include refid="searchCondition"/>  
+   </select>
+   
+   <insert id="insertQNAboardReply" parameterClass="qnaboardVO">
+   	<selectKey keyProperty="qna_no">
+         SELECT QNA_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO QNABOARD(QNA_NO
+                     ,QNA_TITLE
+                     ,QNA_WRITER
+                     ,QNA_PASS
+                     ,QNA_CONTENT
+                     ,QNA_GROUP
+                     ,QNA_G_SEQ
+                     ,QNA_DEPTH
+                     ,ADMIN_ID)
+               VALUES(#qna_no#
+                  ,#qna_title#
+                  ,#qna_writer#
+                  ,#qna_pass#
+                  ,#qna_content#
+                  ,#qna_group#
+                  ,#qna_g_seq#
+                  ,#qna_depth#
+                  ,#admin_id#)
+   </insert>
+ </sqlMap>

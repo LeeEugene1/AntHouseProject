@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="member">
+	<typeAlias alias="memberVO" type="kr.or.redant.vo.MemberVO" />
+	
+	<resultMap class="memberVO" id="memberView">
+		<result property="mem_id" column="mem_id"></result>
+		<result property="mem_pass" column="mem_pass"></result>
+		<result property="mem_name" column="mem_name"></result>
+		<result property="mem_nickname" column="mem_nickname"></result>
+		<result property="mem_mail" column="mem_mail"></result>
+		<result property="mem_hp" column="mem_hp"></result>
+		<result property="mem_bir" column="mem_bir"></result>
+		<result property="mem_zip" column="mem_zip"></result>
+		<result property="mem_add1" column="mem_add1"></result>
+		<result property="mem_add2" column="mem_add2"></result>
+		<result property="mem_delete" column="mem_delete"></result>
+		<result property="mem_deletecheck" column="mem_deletecheck"></result>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT *
+		  FROM MEMBER
+		 WHERE MEM_DELETE = 'N'
+	</sql>
+	
+	<sql id="searchCondition">
+		<dynamic prepend="AND">
+	   		<isNotEmpty property="search_name">
+	   			mem_name like '%'||'search_name'||'%'
+   			</isNotEmpty>
+	   	</dynamic>
+		<dynamic prepend="AND">
+	   		<isNotEmpty property="search_id">
+	   			mem_id like '%'||#search_id#||'%'
+   			</isNotEmpty>
+	   	</dynamic>
+		<dynamic prepend="AND">
+   			<isNotEmpty property="search_hp">
+   				mem_hp like '%'||#search_hp#||'%'
+   			</isNotEmpty>
+	   	</dynamic>
+		<dynamic prepend="AND">
+	   		<isNotEmpty property="search_mail">
+	   			mem_mail like '%'||#search_mail#||'%'
+   			</isNotEmpty>
+	   	</dynamic>
+		<dynamic prepend="AND">
+   			<isNotEmpty property="search_address">
+   				mem_add1 like '%'||#search_address#||'%'
+   			</isNotEmpty>
+	   	</dynamic>
+	</sql>
+	
+	<select id="memberInfo" parameterClass="map" resultMap="memberView">
+		<include refid="selectAll"/>
+		 AND MEM_ID = #mem_id#
+		 <dynamic>
+		 	<isNotEmpty property="mem_pass" prepend="AND">
+			   MEM_PASS = #mem_pass#
+		 	</isNotEmpty>
+		 </dynamic>
+	</select>
+	
+	<insert id="insertMemberInfo" parameterClass="memberVO">
+		INSERT INTO MEMBER
+					(MEM_ID,
+					MEM_PASS,
+					MEM_NAME,
+					MEM_NICKNAME,
+					MEM_BIR,
+					MEM_ZIP,
+					MEM_ADD1,
+					MEM_ADD2,
+					MEM_HP,
+					MEM_MAIL)
+		VALUES (#mem_id#,
+				#mem_pass#,
+				#mem_name#,
+				#mem_nickname#,
+				#mem_bir#,
+				#mem_zip#,
+				#mem_add1#,
+				#mem_add2#,
+				#mem_hp#,
+				#mem_mail#)
+	</insert>
+	
+	<update id="updateMember" parameterClass="memberVO">
+		UPDATE MEMBER
+		   SET MEM_PASS = #mem_pass#
+		      ,MEM_MAIL = #mem_mail#
+		      ,MEM_ADD1 = #mem_add1#
+		      ,MEM_ADD2 = #mem_add2#
+		      ,MEM_ZIP = #mem_zip#
+		      ,MEM_NICKNAME = #mem_nickname#
+		 WHERE MEM_ID = #mem_id#
+	</update>
+	
+	<update id="updateHp" parameterClass="map">
+		UPDATE MEMBER
+		   SET MEM_NAME = #mem_name#
+		      ,MEM_HP = #mem_hp#
+		 WHERE MEM_ID = #mem_id#
+	</update>
+	
+	
+	<select id="memberList" resultClass="memberVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM MEM_RNUM, A.*
+					FROM (<include refid="selectAll"/>
+						  <include refid="searchCondition"/>)A)B
+		<![CDATA[
+		WHERE B.MEM_RNUM <= #startCount#   
+   		  AND B.MEM_RNUM >= #endCount#   
+  		]]>   
+		ORDER BY B.MEM_RNUM DESC				  
+	</select>
+	
+	<select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(MEM_ID) FROM MEMBER WHERE MEM_DELETE = 'N' <include refid="searchCondition"/>
+    </select>
+    
+    <delete id="deleteMember" parameterClass="map">
+		update MEMBER
+		   set MEM_DELETE = 'Y'
+		 where MEM_ID = #mem_id#
+	</delete>
+	
+    <delete id="PleaseOut" parameterClass="map">
+		update MEMBER
+		   set MEM_DELETECHECK = 'Y'
+		 where MEM_ID = #mem_id#
+	</delete>
+	
+	<select id="getMemberId" parameterClass="map" resultClass="String">
+		SELECT MEM_ID FROM MEMBER WHERE MEM_NAME=#mem_name#
+	</select>
+	
+</sqlMap>

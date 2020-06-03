@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="stockForum">
+    <typeAlias alias="stockForumVO" type="kr.or.redant.vo.StockForumVO"/>
+    
+    <resultMap id="stockForumResultMap" class="stockForumVO">
+		<result property="sf_no" column="sf_no"/>
+		<result property="sf_title" column="sf_title"/>
+		<result property="sf_content" column="sf_content"/>
+		<result property="sf_hit" column="sf_hit"/>
+		<result property="sf_reg_date" column="sf_reg_date"/>
+		<result property="sf_status" column="sf_status"/>
+		<result property="sf_group" column="sf_group"/>
+		<result property="sf_seq" column="sf_seq"/>
+		<result property="sf_depth" column="sf_depth"/>
+		<result property="mem_id" column="mem_id"/>
+		<result property="sf_writer" column="sf_writer"/>
+		<result property="sf_items" column="sf_no" select="sfFileItem.fileitemList"/>
+	</resultMap>
+   
+    <sql id="selectAll"> SELECT * FROM STOCKFORUM WHERE SF_STATUS IS NOT NULL</sql>
+    
+    <sql id="searchCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword">
+               <isEqual property="search_keycode" compareValue="search01" open="(" close=")">
+                     SF_TITLE LIKE '%'||#search_keyword#||'%'
+                  OR SF_WRITER LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+               <isEqual property="search_keycode" compareValue="search02">
+                     SF_TITLE LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+               <isEqual property="search_keycode" compareValue="search03">
+                     SF_WRITER LIKE '%'||#search_keyword#||'%'
+               </isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="stockForumList" resultClass="stockForumVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM SF_RNUM, A.*
+					FROM (<include refid="selectAll"/>
+						  <include refid="searchCondition"/>
+						  ORDER BY SF_GROUP,SF_SEQ DESC) A) B
+		<![CDATA[
+		WHERE B.SF_RNUM <= #startCount#   
+   		  AND B.SF_RNUM >= #endCount#   
+  		]]>   
+		ORDER BY B.SF_RNUM DESC				  
+	</select>
+	
+	<update id="updateHIT" parameterClass="map">
+      UPDATE STOCKFORUM
+         SET SF_HIT = SF_HIT + 1
+       WHERE SF_NO = #sf_no#
+    </update>
+    
+    <select id="incrementSEQ" parameterClass="stockForumVO" resultClass="String">
+      SELECT MAX(SF_SEQ) + 1
+        FROM STOCKFORUM
+       WHERE SF_GROUP = #sf_group#
+   </select>
+    
+    <update id="updateSEQ" parameterClass="stockForumVO">
+      UPDATE STOCKFORUM
+         SET SF_SEQ = SF_SEQ + 1
+       WHERE SF_GROUP = #sf_group#
+         AND SF_SEQ > #sf_seq#
+   </update>
+    
+    <select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(SF_NO)
+   		  FROM STOCKFORUM WHERE SF_STATUS IS NOT NULL
+   		 <include refid="searchCondition"/>  
+   </select>
+   
+    <select id="stockForumInfo" parameterClass="map" resultMap="stockForumResultMap">
+		<include refid="selectAll"/>
+		   AND SF_NO = #sf_no#
+	</select>	
+
+	<update id="updateStockForum" parameterClass="stockForumVO">
+		UPDATE STOCKFORUM
+		   SET SF_TITLE   =  #sf_title#   
+			,SF_CONTENT   =  #sf_content#
+		 WHERE SF_NO = #sf_no#
+	</update>
+	
+	<delete id="deleteStockForum" parameterClass="map">
+		update STOCKFORUM
+		   set SF_STATUS = 'N'
+		 where SF_NO = #sf_no#
+	</delete>
+	
+	<insert id="insertStockForum" parameterClass="stockForumVO">
+		<selectKey keyProperty="sf_no" resultClass="String">
+			SELECT STOCKFORUM_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+      INSERT INTO STOCKFORUM(SF_NO
+                     ,SF_TITLE
+                     ,SF_WRITER
+                     ,SF_CONTENT
+                     ,SF_GROUP
+                     ,MEM_ID)
+               VALUES(#sf_no#
+                  ,#sf_title#
+                  ,#sf_writer#
+                  ,#sf_content#
+                  ,#sf_no#
+                  ,#mem_id#)
+	</insert>
+	
+   <insert id="insertStockForumReply" parameterClass="stockForumVO">
+   	<selectKey keyProperty="sf_no" resultClass="String">
+         SELECT STOCKFORUM_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO STOCKFORUM(SF_NO
+                     ,SF_TITLE
+                     ,SF_WRITER
+                     ,SF_CONTENT
+                     ,SF_GROUP
+                     ,SF_SEQ
+                     ,SF_DEPTH
+                     ,MEM_ID)
+               VALUES(#sf_no#
+                  ,#sf_title#
+                  ,#sf_writer#
+                  ,#sf_content#
+                  ,#sf_group#
+                  ,#sf_seq#
+                  ,#sf_depth#
+                  ,#mem_id#)
+   </insert>
+   
+ </sqlMap>

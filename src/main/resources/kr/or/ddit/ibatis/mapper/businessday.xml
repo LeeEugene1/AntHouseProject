@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="businessday">
+   <typeAlias alias="businessdayVO" type="kr.or.redant.vo.BusinessDayVO"/>
+   
+<!--    <resultMap id="businessdayResultMap" class="businessdayVO"> -->
+<!-- 		<result property="bs_date" column="bs_date"/> -->
+<!-- 	</resultMap> -->
+	
+	<select id="selectYear" resultClass="businessdayVO">
+		SELECT DISTINCT TO_CHAR(BS_DATE, 'YYYY') "bs_date"
+			FROM BUSINESSDAY 
+			ORDER BY TO_CHAR(BS_DATE,'YYYY') ASC
+	</select>
+	
+	<select id="selectMonth" resultClass="businessdayVO" parameterClass="map">
+		SELECT DISTINCT TO_CHAR(BS_DATE, 'MM') "bs_date"
+			FROM BUSINESSDAY 
+			WHERE TO_CHAR(BS_DATE,'YYYY') = #bsYear#
+			ORDER BY TO_CHAR(BS_DATE,'MM') ASC
+	</select>
+	
+	<select id="selectDate" resultClass="businessdayVO" parameterClass="map">
+		SELECT DISTINCT TO_CHAR(BS_DATE, 'DD') "bs_date"
+			FROM BUSINESSDAY 
+			WHERE TO_CHAR(BS_DATE,'YYYY') = #bsYear#
+			AND TO_CHAR(BS_DATE,'MM') = #bsMonth#
+			ORDER BY TO_CHAR(BS_DATE, 'DD') ASC
+	</select>
+		
+	
+	
+ </sqlMap>

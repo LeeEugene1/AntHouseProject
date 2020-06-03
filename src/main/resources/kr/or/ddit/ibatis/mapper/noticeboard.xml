@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="noticeboard">
+   <typeAlias alias="noticeboardVO" type="kr.or.redant.vo.NoticeboardVO"/>
+   
+   <resultMap id="noticeboardResultMap" class="noticeboardVO">
+		<result property="notice_no" column="notice_no"/>
+		<result property="notice_title" column="notice_title"/>
+		<result property="notice_content" column="notice_content"/>
+		<result property="notice_hit" column="notice_hit"/>
+		<result property="notice_reg_date" column="notice_reg_date"/>
+		<result property="notice_status" column="notice_status"/>
+		<result property="admin_id" column="admin_id"/>
+		<result property="notice_writer" column="notice_writer"/>
+	</resultMap>
+	
+	<sql id="selectAll">
+		SELECT *
+			FROM NOTICEBOARD
+			WHERE NOTICE_STATUS = 'Y'
+	</sql>
+		
+	<sql id="searchCondition">
+		<dynamic prepend="AND">
+			<isNotEmpty property="search_keyword">
+				<isEqual property="search_keycode" compareValue="search01" open="(" close=")">
+					NOTICE_TITLE LIKE '%' || #search_keyword# || '%'
+				OR NOTICE_CONTENT LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="search02">
+					NOTICE_TITLE LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+				<isEqual property="search_keycode" compareValue="search03">
+					NOTICE_CONTENT LIKE '%' || #search_keyword# || '%'
+				</isEqual>
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+	
+	<select id="noticeboardInfo" parameterClass="map" resultMap="noticeboardResultMap">
+		<include refid="selectAll"/>
+		AND NOTICE_NO = #notice_no#
+	</select>
+	
+	<select id="noticeboardList" resultClass="noticeboardVO" parameterClass="map">
+		SELECT B.*
+			FROM (SELECT ROWNUM NOTICE_RNUM, A.*
+					FROM (<include refid="selectAll"/>
+						  <include refid="searchCondition"/>
+					) A) B			  
+		<![CDATA[
+  		WHERE B.NOTICE_RNUM <= #startCount#  
+   		  AND B.NOTICE_RNUM >= #endCount# 
+  		]]>    
+		ORDER BY B.NOTICE_RNUM DESC				  
+	</select>
+	
+<!-- 	<select id="noticeboardList" resultClass="noticeboardVO"> -->
+<!-- 		SELECT * FROM NOTICEBOARD WHERE NOTICE_STATUS = 'Y' -->
+<!-- 	</select> -->
+	
+	<update id="updateHIT" parameterClass="map">
+      UPDATE NOTICEBOARD
+         SET NOTICE_HIT = NOTICE_HIT + 1
+       WHERE NOTICE_NO = #notice_no#
+    </update>
+	
+	<insert id="insertNoticeboard" parameterClass="noticeboardVO">
+      <selectKey keyProperty="notice_no" resultClass="string">
+         SELECT NOTICE_SEQ.NEXTVAL FROM DUAL
+      </selectKey>
+      INSERT INTO NOTICEBOARD(NOTICE_NO
+                     ,NOTICE_TITLE
+                     ,NOTICE_WRITER
+                     ,NOTICE_CONTENT
+                     ,ADMIN_ID)
+               VALUES(#notice_no#
+                  ,#notice_title#
+                  ,#notice_writer#
+                  ,#notice_content#
+                  ,#admin_id#)
+   </insert>
+   	
+   <update id="updateNoticeboard" parameterClass="noticeboardVO">
+      UPDATE NOTICEBOARD
+         SET NOTICE_TITLE   =  #notice_title#
+         	,NOTICE_CONTENT   =  #notice_content#
+       WHERE NOTICE_NO = #notice_no#
+   </update>
+   	
+   	
+	<delete id="deleteNoticeboard" parameterClass="map">
+		update NOTICEBOARD
+	   		set NOTICE_STATUS = 'N'
+	 	where NOTICE_NO = #notice_no#
+	</delete>
+   	
+	<select id="totalCount" parameterClass="map" resultClass="string">
+   		SELECT COUNT(NOTICE_NO)
+   		  FROM NOTICEBOARD
+   		 WHERE NOTICE_STATUS = 'Y'
+	</select>
+   
+ </sqlMap>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap    
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="slImageFile">
+	<typeAlias alias="slimagefileVO" type="kr.or.redant.vo.SLImageFileVO"/>
+	
+	  <statement id="fileitemList" resultClass="slimagefileVO">
+   		SELECT *
+   			FROM SLIMAGEFILE
+   			WHERE SL_NO = #sl_no#
+   	</statement>
+	
+	<insert id="insertSLImageFile" parameterClass="slimagefileVO">
+		<selectKey keyProperty="sl_img_no">
+			SELECT SLIMGFILE_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO SLIMAGEFILE(SL_IMG_NO
+							,SL_NO
+							,SL_IMG_NAME
+							,SL_IMG_SAVE_NAME
+							,SL_IMG_TYPE
+							,SL_IMG_SIZE)
+						VALUES(#sl_img_no#
+							,#sl_no#
+							,#sl_img_name#
+							,#sl_img_save_name#
+							,#sl_img_type#
+							,#sl_img_size#)	
+	</insert>
+	
+	<select id="slImageFileInfo" parameterClass="map" resultClass="slimagefileVO">
+		SELECT *
+			FROM SLIMAGEFILE
+			WHERE SL_IMG_NO = #sl_img_no#
+	</select>
+</sqlMap>
