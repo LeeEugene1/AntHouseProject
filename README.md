@@ -31,5 +31,5 @@
 ![6 frontend](https://user-images.githubusercontent.com/59987309/83732248-b9210980-a686-11ea-9dfe-19b401bfb7bc.jpg)
 
 # 시연
-* 프로젝트시연 : <1.212.157.149:8090/redant/main.do>
-* 이메일링크: <happyHackingEugene@gmail.com>
+* 프로젝트시연 : 1.212.157.149:8090/redant/main.do
+* 이메일: <happyHackingEugene@gmail.com>
