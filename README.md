@@ -29,7 +29,8 @@
 # 프론트앤드
 57개의 UI 페이지를 담당하여 HTML,CSS,자바스크립트로 화면을 제작하였습니다. 
 그외 chart.js 차트와 daum 우편번호 API를 적용하였습니다.
-![6 frontend](https://user-images.githubusercontent.com/59987309/83781593-b5fb3d00-a6c9-11ea-9ace-c737db61745e.jpg)
+![6 frontend](https://user-images.githubusercontent.com/59987309/83781797-f5c22480-a6c9-11ea-9110-29d48670538f.jpg)
+
 
 <br>
 # 시연
