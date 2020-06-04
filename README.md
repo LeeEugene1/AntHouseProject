@@ -13,19 +13,19 @@
 게시판을 담당하여 기본적인 CRUD외 validation, 검색, pagenation 기능을 구현하였습니다. xml, dao, service, controller, view순으로 코드를 준비하였습니다.
 1. xml
 ![final-project-capture](https://user-images.githubusercontent.com/59987309/83714677-67688700-a666-11ea-982f-19a7573f03ee.jpg)
-<br>
+
 2. DAO
 ![2 dao](https://user-images.githubusercontent.com/59987309/83743546-d3161880-a695-11ea-92e5-b89036ba1295.jpg)
-<br>
-3. Service
+
+3.Service
 ![3 service](https://user-images.githubusercontent.com/59987309/83743548-d4474580-a695-11ea-9a92-9149d49d23eb.jpg)
-<br>
-4. Controller
+
+4.Controller
 ![4 controller](https://user-images.githubusercontent.com/59987309/83743550-d4dfdc00-a695-11ea-914d-52ec20e7523b.jpg)
-<br>
+
 5. View
 ![5 view](https://user-images.githubusercontent.com/59987309/83723408-9f2cfa00-a679-11ea-80bf-37317d5dde46.jpg)
-<br>
+
 # 프론트앤드
 57개의 UI 페이지를 담당하여 HTML,CSS,자바스크립트로 화면을 제작하였습니다. 
 그외 chart.js 차트와 daum 우편번호 API를 적용하였습니다.
