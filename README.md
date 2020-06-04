@@ -31,8 +31,6 @@
 그외 chart.js 차트와 daum 우편번호 API를 적용하였습니다.
 ![6 frontend](https://user-images.githubusercontent.com/59987309/83781797-f5c22480-a6c9-11ea-9110-29d48670538f.jpg)
 
-
-<br>
 # 시연
 * 프로젝트시연 : 1.212.157.149:8090/redant/main.do
 * 이메일: <happyHackingEugene@gmail.com>
