@@ -9,7 +9,7 @@
 진행할수있었습니다. 결과를 보니 뿌듯하였고 앞으로 많은 프로젝트를 통해 실력을 더 키우고 싶습니다.<br>
 
 # 백앤드
-게시판을 담당하여 기본적인 CRUD외 validation, 검색, pagenation 기능을 구현하였습니다. 
+게시판을 담당하여 기본적인 CRUD외 validation, 검색, pagenation 기능을 구현하였습니다. xml, dao, service, controller, view순으로 코드를 준비하였습니다.
 1. xml
 ![final-project-capture](https://user-images.githubusercontent.com/59987309/83714677-67688700-a666-11ea-982f-19a7573f03ee.jpg)
 
