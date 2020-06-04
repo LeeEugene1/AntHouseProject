@@ -14,7 +14,7 @@
 1. xml 
 ![final-project-capture](https://user-images.githubusercontent.com/59987309/83714677-67688700-a666-11ea-982f-19a7573f03ee.jpg)
 
-2. DAO : xml의 데이터의 접근과 갱신을 담당
+2. DAO : xml 데이터의 접근과 갱신을 담당
 ![2 dao](https://user-images.githubusercontent.com/59987309/83743546-d3161880-a695-11ea-92e5-b89036ba1295.jpg)
 
 3.Service : DAO를 호출해 여러번의 데이터 접근과 갱신 담당
